@@ -178,8 +178,8 @@ defmodule TaskBunny.Job do
     enqueue!(job, payload, opts)
     Task.await(task, job.timeout())
 
-  # rescue
-  #   e in [ConnectError, PublishError, QueueNotFoundError] -> {:error, e}
+  rescue
+    e in [ConnectError, PublishError, QueueNotFoundError] -> {:error, e}
   end
 
   @doc """
