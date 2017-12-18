@@ -211,4 +211,17 @@ defmodule TaskBunny.Config do
       _ -> [TaskBunny.FailureBackend.Logger]
     end
   end
+
+  @doc """
+  Returns the RPC worker
+
+  It returns `TaskBunny.Worker.ReplyTo` by default.
+  """
+  @spec reply_to :: [atom]
+  def reply_to do
+    case Application.fetch_env(:task_bunny, :reply_to) do
+      {:ok, atom} when is_atom(atom) -> [atom]
+      _ -> [TaskBunny.Worker.ReplyTo]
+    end
+  end
 end

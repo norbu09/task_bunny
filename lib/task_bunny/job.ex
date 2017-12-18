@@ -125,6 +125,12 @@ defmodule TaskBunny.Job do
       @behaviour Job
 
       @doc false
+      @spec call(Map, keyword) :: {:ok, any} | {:error, any}
+      def call(payload, options \\ []) do
+        TaskBunny.Job.call(__MODULE__, payload, options)
+      end
+
+      @doc false
       @spec enqueue(any, keyword) :: :ok | {:error, any}
       def enqueue(payload, options \\ []) do
         TaskBunny.Job.enqueue(__MODULE__, payload, options)
@@ -154,6 +160,26 @@ defmodule TaskBunny.Job do
 
       defoverridable [timeout: 0, max_retry: 0, retry_interval: 1]
     end
+  end
+
+  @spec call(atom, any, keyword) :: {:ok, any} | {:error, any}
+  def call(job, payload, options \\ []) do
+
+    task = Task.Supervisor.async(TaskBunny.TaskSupervisor, fn ->
+      receive do
+        response            -> response
+        after job.timeout() -> {:error, :timeout}
+        end
+    end)
+
+    app_id = task.pid |> :erlang.pid_to_list |> List.to_string
+    reply_to = Config.reply_to()
+    opts = Keyword.merge(options, [app_id: app_id, reply_to: reply_to])
+    enqueue!(job, payload, opts)
+    Task.await(task, job.timeout())
+
+  # rescue
+  #   e in [ConnectError, PublishError, QueueNotFoundError] -> {:error, e}
   end
 
   @doc """
