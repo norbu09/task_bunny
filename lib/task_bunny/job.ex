@@ -125,9 +125,9 @@ defmodule TaskBunny.Job do
       @behaviour Job
 
       @doc false
-      @spec call(Map, keyword) :: {:ok, any} | {:error, any}
-      def call(payload, options \\ []) do
-        TaskBunny.Job.call(__MODULE__, payload, options)
+      @spec rpc(Map, keyword) :: :ok | {:error, any}
+      def rpc(payload, options \\ []) do
+        TaskBunny.Job.rpc(__MODULE__, payload, options)
       end
 
       @doc false
@@ -162,8 +162,8 @@ defmodule TaskBunny.Job do
     end
   end
 
-  @spec call(atom, any, keyword) :: {:ok, any} | {:error, any}
-  def call(job, payload, options \\ []) do
+  @spec rpc(atom, any, keyword) :: :ok | {:error, any}
+  def rpc(job, payload, options \\ []) do
 
     task = Task.Supervisor.async(TaskBunny.TaskSupervisor, fn ->
       receive do

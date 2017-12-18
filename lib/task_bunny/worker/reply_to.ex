@@ -1,4 +1,9 @@
 defmodule TaskBunny.Worker.ReplyTo do
+  @moduledoc """
+  A simple reply_to handler that will send a message to the calling PID
+
+  """
+
   use TaskBunny.Job
   require Logger
 

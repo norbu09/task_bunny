@@ -220,8 +220,8 @@ defmodule TaskBunny.Config do
   @spec reply_to :: [atom]
   def reply_to do
     case Application.fetch_env(:task_bunny, :reply_to) do
-      {:ok, atom} when is_atom(atom) -> [atom]
-      _ -> [TaskBunny.Worker.ReplyTo]
+      {:ok, atom} when is_atom(atom) -> Atom.to_string(atom)
+      _ -> "TaskBunny.Worker.ReplyTo"
     end
   end
 end
