@@ -252,6 +252,7 @@ defmodule TaskBunny.Worker do
     Publisher.publish(state.host, retry_queue, body, options)
 
     Consumer.ack(state.channel, meta, true)
+    respond(:retry, meta)
     :ok
   end
 
@@ -261,6 +262,7 @@ defmodule TaskBunny.Worker do
     Publisher.publish(state.host, rejected_queue, body)
 
     Consumer.ack(state.channel, meta, true)
+    respond(:error, meta)
     :ok
   end
 
@@ -273,6 +275,14 @@ defmodule TaskBunny.Worker do
     end
   end
 
+  defp respond(:retry, meta) do
+    message = %{"status" => "retry"}
+    respond({:ok, message}, meta)
+  end
+  defp respond(:error, meta) do
+    message = %{"status" => "error"}
+    respond({:ok, message}, meta)
+  end
   defp respond(:ok, meta) do
     message = %{"status" => "ok"}
     respond({:ok, message}, meta)
